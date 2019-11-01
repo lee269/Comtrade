@@ -1,3 +1,8 @@
+# Download complete trade for one country for one year.
+# period: year to request
+# reporter: country id
+# token: bulk dowload api access token
+# dest_folder: folder to save file in format id-year.csv
 get_country_year <- function(period = "2016",
                              reporter = "152",
                              token = "",

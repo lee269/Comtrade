@@ -4,6 +4,7 @@ library(httr)
 library(tidyverse)
 
 source(here("R", "get_country_year.R"))
+source(here("R", "process_country.R"))
 
 auth <- readRDS(here("keys", "auth.rds"))
 authcode <- as.character(auth[1,1])
@@ -22,24 +23,17 @@ authcode <- as.character(auth[1,1])
 # 752 - Sweden
 # 826 - UK
 # 842 - USA
+# 156 - China
 
 
-process_countries <- function(country_id, country_name){
-  
-  yr <- 2000:2017
-  map(yr, get_country_year, reporter = country_id, token = authcode, dest_folder = here("data", "downloads"))
-  files <- list.files(here("data", "downloads"), full.names = TRUE)
-  union <- map_df(files, read_csv)
-  saveRDS(union, here("data", "final", paste0(country_name,"_all.rds")))
-  map(files, file.remove)
-  
-}
 
 
-process_countries("246", "finland")
+
+process_country(country_id = "442",country_name =  "luxembourg", year_start = 2010, year_end = 2017, token = authcode)
 
 
-ids <- c("40","203","208","246","251","276","381","442","528","703","724","752","826","842")
-ctrys <- c("austria","czechia","denmark","finland","france","germany","italy","luxembourg","netherlands","slovakia","spain","sweden","uk","usa")
+ids <- c("40","203","208","246","251","276","381","442","528","703","724","752","826","842", "156")
+ctrys <- c("austria","czechia","denmark","finland","france","germany","italy","luxembourg","netherlands","slovakia","spain","sweden","uk","usa", "china")
 
-map2(ids, ctrys, process_countries)
+
+pmap(list(ids, ctrys, 2000, 2017), process_country)
