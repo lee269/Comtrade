@@ -3,11 +3,12 @@ library(here)
 library(httr)
 library(tidyverse)
 
-source(here("R", "get_country_year.R"))
-source(here("R", "process_country.R"))
+source(here::here("R", "get_country_year.R"))
+source(here::here("R", "process_country.R"))
 
-auth <- readRDS(here("keys", "auth.rds"))
+auth <- readRDS(here::here("keys", "auth.rds"))
 authcode <- as.character(auth[1,1])
+
 
 # 40 - Austria
 # 203 - Czechia
@@ -24,16 +25,26 @@ authcode <- as.character(auth[1,1])
 # 826 - UK
 # 842 - USA
 # 156 - China
+# 699 - India
+# 710 - South Africa
 
 
+# Download multiple countries
+ids <- c("40","203","208","246","251","276","381","442","528","703","724","752")
+ctrys <- c("austria","czechia","denmark","finland","france","germany","italy","luxembourg","netherlands","slovakia","spain","sweden")
 
 
+period <- c(2010:2017)
+reporter <- 703
+folder <- here("data", "downloads")
 
-process_country(country_id = "442",country_name =  "luxembourg", year_start = 2010, year_end = 2017, token = authcode)
+# one country, multiple years
+# pmap(list(period, reporter, authcode, folder), get_country_year)
 
+# multiple countries, multiple years
+mult <- function(ctrys){
+  pmap(list(period, ctrys, authcode, folder), get_country_year)
+}
 
-ids <- c("40","203","208","246","251","276","381","442","528","703","724","752","826","842", "156")
-ctrys <- c("austria","czechia","denmark","finland","france","germany","italy","luxembourg","netherlands","slovakia","spain","sweden","uk","usa", "china")
-
-
-pmap(list(ids, ctrys, 2000, 2017), process_country)
+ids <- c(579, 586, 616, 710)
+map(ids, mult)

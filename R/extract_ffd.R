@@ -1,5 +1,19 @@
-process_country <- function(country_id, country_name, year_start, year_end, token){
+# Extracts FFD level data at 4 digit from a comtrade bulk download zipfile
+# file is the zipfile to process
+extract_ffd <- function(file){
   require(tidyverse)
+  source(here::here("R", "db_safe_names.R"))
+  print(paste("Processing:", file))
+  tmpdir <- tempdir()
+  # get the csv filename from within the zipfile
+  filename <- unzip(file, list = TRUE)[1,1]
+  
+  # unzip into temporary directory, read in the csv and clean up (because the unzipped csvs can be massive)
+  unzip(file, exdir = tmpdir)
+  all_trade <- read_csv(paste0(tmpdir,"/", filename))
+  file.remove(paste0(tmpdir,"/", filename))
+  
+  
   hs4 <- c("0201", "0202", "0203", "0204", "0205", "0206", "0207", "0208", "0209", "0210", "0301", "0302", "0303", "0304", "0305", "0306", "0307", "0308", "0401",
            "0402", "0403", "0404", "0405", "0406", "0407", "0408", "0409", "0410", "0502", "0503", "0504", "0505", "0506", "0507", "0508", "0509", "0510", "0511",
            "0601", "0602", "0603", "0604", "0701", "0702", "0703", "0704", "0705", "0706", "0707", "0708", "0709", "0710", "0711", "0712", "0713", "0714", "0801",
@@ -12,23 +26,15 @@ process_country <- function(country_id, country_name, year_start, year_end, toke
            "2104", "2105", "2106", "2201", "2202", "2203", "2204", "2205", "2206", "2207", "2208", "2209", "2301", "2302", "2303", "2304", "2305", "2306", "2307",
            "2308", "2309")
   
-  # years to request - parameterise
-  yr <- year_start:year_end
+  # filter for food and drink and aggregate up to 4 digit, tidy up column names 
+  ffd_trade <- all_trade %>% 
+                filter(`Trade Flow Code` == 1,
+                       `Aggregate Level` == 4,
+                       `Commodity Code` %in% hs4) %>% 
+                group_by(Year, `Trade Flow`, `Reporter Code`, Reporter, `Reporter ISO`, `Partner Code`, Partner, `Partner ISO`, `Commodity Code`) %>% 
+                summarise(net_weight_kg = sum(`Netweight (kg)`), trade_value_us = sum(`Trade Value (US$)`)) %>% 
+                ungroup()
   
-  # request years from comtrade and save csvs in downloads folder
-  map(yr, get_country_year, reporter = country_id, token = token, dest_folder = here("data", "downloads"))
-  
-  # join all downloaded csvs and save as rds in filan folder, then clean up csvs
-  files <- list.files(here("data", "downloads"), full.names = TRUE)
-  union <- map_df(files, read_csv)
-  union <- union %>% 
-            filter(`Trade Flow Code` == 1,
-                   `Aggregate Level` == 4,
-                   `Commodity Code` %in% hs4) %>% 
-            group_by(Year, `Trade Flow`, `Reporter Code`, Reporter, `Reporter ISO`, `Partner Code`, Partner, `Partner ISO`, `Commodity Code`) %>% 
-            summarise(net_weight_kg = sum(`Netweight (kg)`), trade_value_us = sum(`Trade Value (US$)`))
-
-    saveRDS(union, here("data", "final", paste0(country_name,"_all.rds")))
-  map(files, file.remove)
-  
+  colnames(ffd_trade) <- db_safe_names(colnames(ffd_trade))
+  return(ffd_trade)
 }
