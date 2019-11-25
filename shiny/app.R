@@ -42,6 +42,8 @@ server <- function(input, output, session){
   country_flag <- callModule(country_flag_mod_server, id = "flag", dataset = country_meta, country = country_selected, height = "25%", width = "25%")
   country_map <- callModule(country_map_mod_server, id = "map", dataset = world, country = country_selected)
   indicators <- callModule(wb_indicators_mod_server, id =  "indicators", dataset = wb_indicators, country = country_selected)
+  
+
 }
 
 

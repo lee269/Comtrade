@@ -41,18 +41,3 @@ country_select_mod_server <- function(input, output, session) {
 
 
 
-#' Country trade indicators for dashboard
-#' 
-#'
-#' @param id, character used to specify namespace, see \code{shiny::\link[shiny]{NS}} 
-#'
-#' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements - a table of indicators.
-#' @export
-#'
-#' @examples
-country_indicators_mod_ui <- function(id){
-  ns <- NS(id)
-  tagList(
-    DT::dataTableOutput(outputId = ns("country_indicators"))
-  )
-}

@@ -1,3 +1,5 @@
+# makes an rds containing food trade from the contents of the data download folder.
+
 library(tidyverse)
 source(here::here("R", "extract_ffd.R"))
 
