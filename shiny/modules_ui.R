@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-country_select_mod_ui <- function(id, data, label = "Select country:"){
+mod_ui_country_select <- function(id, data, label = "Select country:"){
   ns <- NS(id)
   
   # https://rpodcast.shinyapps.io/modules_article1/
@@ -35,7 +35,7 @@ country_select_mod_ui <- function(id, data, label = "Select country:"){
 #' @export
 #'
 #' @examples
-country_select_mod_server <- function(input, output, session) {
+mod_server_country_select <- function(input, output, session) {
   return(list(country = reactive(input$country)))
 }
 

@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-country_indicators_mod_ui <- function(id){
+mod_ui_country_indicators <- function(id){
   ns <- NS(id)
   tagList(
     DT::dataTableOutput(outputId = ns("country_indicators"))
@@ -25,7 +25,7 @@ country_indicators_mod_ui <- function(id){
 #' @export
 #'
 #' @examples
-country_indicators_mod_server <- function(input, output, session, dataset, country){
+mod_server_country_indicators <- function(input, output, session, dataset, country){
   ind_table <- reactive({
     dt <- dataset %>% filter(reporter_iso == country$country())
     return(dt)
@@ -47,7 +47,7 @@ country_indicators_mod_server <- function(input, output, session, dataset, count
 #' @export
 #'
 #' @examples
-wb_indicators_mod_ui <- function(id){
+mod_ui_wb_indicators <- function(id){
   ns <- NS(id)
   tagList(
     DT::dataTableOutput(outputId = ns("wb_indicators"))
@@ -65,7 +65,7 @@ wb_indicators_mod_ui <- function(id){
 #' @export
 #'
 #' @examples
-wb_indicators_mod_server <- function(input, output, session, dataset, country){
+mod_server_wb_indicators <- function(input, output, session, dataset, country){
   ind_table <- reactive({
     dt <- dataset %>% filter(reporter_iso == country$country())
     return(dt)
@@ -74,4 +74,47 @@ wb_indicators_mod_server <- function(input, output, session, dataset, country){
   output$wb_indicators <- DT::renderDataTable({
     ind_table()
   })
+}
+
+
+#' Title
+#'
+#' @param id 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+mod_ui_wb_meta <- function(id){
+  ns <- NS(id)
+  tagList(
+    tags$strong(textOutput(outputId = ns("country_meta")))
+  )
+}
+
+
+#' Title
+#'
+#' @param input 
+#' @param output 
+#' @param session 
+#' @param dataset 
+#' @param country 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+mod_server_wb_meta <- function(input, output, session, dataset, country, indicator){
+  wb_table <- reactive({
+    dt <- dataset %>% filter(reporter_iso == country$country(), indicatorID == indicator())
+    # dt <- subset(dataset, reporter_iso == country$country())
+    # dt <- subset(dt, indicatorID == indicator)
+    return(dt)
+  })
+  
+  output$country_meta <- renderText({
+    paste(wb_table()$indicator_short_text[1], ":", wb_table()$value[1])
+  })
+  
 }

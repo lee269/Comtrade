@@ -16,33 +16,51 @@ world <- world %>% left_join(ffd_indicators, by = c("region" = "reporter"))
 # Something about this csv - if I load it all up the flags stop working - if I
 # just take the iso and flag png, it works. Need to fix this becuse there is
 # more useful metadata in it.
-country_meta <- read_csv(here::here("data", "reference", "countries.csv")) %>% select(reporter_iso, png)
+# country_meta <- read_csv(here::here("data", "reference", "countries.csv")) %>% select(reporter_iso, png)
+country_meta <- readRDS(here::here("data", "reference", "countries.rds")) %>% select(reporter_iso, png)
 
 
+# UI Elements -------------------------------------------------------------
+
+country_selector <- wellPanel(mod_ui_country_select(id = "country_selected", data = ffd_indicators)) 
+
+flag_section <- wellPanel(
+                  splitLayout(mod_ui_country_flag(id = "flag"),
+                              mod_ui_country_map(id = "map", height = 100, width = 100),
+                              cellWidths = c("40%", "60%"))
+                         )
+
+country_details <- wellPanel(mod_ui_wb_meta(id = "country_desc")
+                             )
+
+body_section <- mainPanel(tags$h3("Some stuff"),
+                          mod_ui_wb_indicators(id = "indicators"),
+                          tags$h3("And some more stuff"),
+                          mod_ui_country_indicators(id = "ffd_indicators")
+                          )
 
 # UI ----------------------------------------------------------------------
 ui <- fluidPage(
-  sidebarLayout(
-    sidebarPanel(country_select_mod_ui(id = "country_selected", data = ffd_indicators),
-                 country_flag_mod_ui(id = "flag"),
-                 country_map_mod_ui(id = "map")
-                 ),
-    mainPanel(
-              wb_indicators_mod_ui(id = "indicators"),
-              country_indicators_mod_ui(id = "ffd_indicators")
-              )
-  )
-)
+        # titlePanel("Dashboard"),
+        column(width = 3,
+               fluidRow(country_selector),
+               fluidRow(flag_section),
+               fluidRow(country_details)
+               ),
+        column(width = 9,
+               fluidRow(body_section)
+               )
+            )
 
 
 # Server ------------------------------------------------------------------
 server <- function(input, output, session){
-  country_selected <- callModule(country_select_mod_server, id = "country_selected")
-  country_indicators <- callModule(country_indicators_mod_server,id =  "ffd_indicators", dataset = ffd_indicators, country = country_selected)
-  country_flag <- callModule(country_flag_mod_server, id = "flag", dataset = country_meta, country = country_selected, height = "25%", width = "25%")
-  country_map <- callModule(country_map_mod_server, id = "map", dataset = world, country = country_selected)
-  indicators <- callModule(wb_indicators_mod_server, id =  "indicators", dataset = wb_indicators, country = country_selected)
-  
+  country_selected <- callModule(mod_server_country_select, id = "country_selected")
+  country_indicators <- callModule(mod_server_country_indicators,id =  "ffd_indicators", dataset = ffd_indicators, country = country_selected)
+  country_flag <- callModule(mod_server_country_flag, id = "flag", dataset = country_meta, country = country_selected, height = "66", width = "100")
+  country_map <- callModule(mod_server_country_map, id = "map", dataset = world, country = country_selected)
+  indicators <- callModule(mod_server_wb_indicators, id =  "indicators", dataset = wb_indicators, country = country_selected)
+  wb_text <- callModule(mod_server_wb_meta, id = "country_desc", dataset = wb_indicators, country = country_selected, indicator = reactive("NY.GDP.PCAP.PP.KD"))
 
 }
 

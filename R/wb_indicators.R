@@ -49,13 +49,14 @@ wbgrowth <- wbinds %>%
       mutate(indicator_growth = estimate * 100) %>% 
       select(iso3c, indicatorID, indicator_growth)
 
-# Join tem all up and name consistently
+# Join them all up and name consistently
 wb_indicators <- wbranks %>% 
     left_join(wbgrowth) %>% 
     left_join(indicators) %>% 
     rename(reporter_iso = iso3c,
            year = date,
-           reporter = country)
+           reporter = country) %>% 
+    ungroup()
 
 
 saveRDS(wb_indicators, here::here("data", "db", "wb_indicators.rds"))
