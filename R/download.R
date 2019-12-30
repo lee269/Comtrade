@@ -9,7 +9,7 @@ source(here::here("R", "get_country_year.R"))
 auth <- readRDS(here::here("keys", "auth.rds"))
 
 periods <- c(2010:2018)
-countrys <- c(348, 404)
+countrys <- c(170,188, 196, 233, 348, 352, 376, 388, 428, 440, 499, 504, 554, 591, 620, 642, 688, 702, 705, 757, 788, 784, 804)
 authcode <- as.character(auth[1,1])
 folder <- here::here("data", "downloads")
 

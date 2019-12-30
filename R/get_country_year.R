@@ -19,7 +19,7 @@ get_country_year <- function(period = "2016",
     string <- paste0(url,type, "/", freq, "/", period, "/", reporter, "/", classification,"?token=", token)
 
     tmp <- tempfile()
-    download.file(string, destfile = tmp)
+    try(download.file(string, destfile = tmp))
     
     if (unzip == FALSE) { 
       
