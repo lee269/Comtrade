@@ -3,7 +3,7 @@
 library(tidyverse)
 
 reporters <- readRDS(here::here("data", "reference", "reporters.rds"))
-ffd_trade <- readRDS(here("data", "db", "ffd_trade.rds"))
+ffd_trade <- readRDS(here::here("data", "db", "ffd_trade.rds"))
 
 
 data <- ffd_trade %>% 
