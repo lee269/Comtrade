@@ -1,6 +1,6 @@
 library(shiny)
 library(tidyverse)
-Sys.setenv(http_proxy="http://10.85.4.54:8080", https_proxy="https://10.85.4.54:8080")
+# Sys.setenv(http_proxy="http://10.85.4.54:8080", https_proxy="https://10.85.4.54:8080")
 
 
 # Setup -------------------------------------------------------------------
