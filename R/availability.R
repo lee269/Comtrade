@@ -18,3 +18,4 @@ availability <- reporters %>%
       select(-reporter) %>% 
       rename(reporter = text,
              reporter_code = id)
+
