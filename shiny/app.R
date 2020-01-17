@@ -5,7 +5,8 @@ library(tidyverse)
 
 # Setup -------------------------------------------------------------------
 source(here::here("shiny", "modules_ui.R"))
-source(here::here("shiny", "modules_data.R"))
+source(here::here("shiny", "modules_wb_data.R"))
+source(here::here("shiny", "modules_trade_data.R"))
 source(here::here("shiny", "modules_misc.R"))
 
 ffd_indicators <- readRDS(here::here("data", "db", "ffd_indicators.rds")) %>% ungroup()
@@ -22,6 +23,7 @@ country_meta <- readRDS(here::here("data", "reference", "countries.rds")) %>% se
 
 # UI Elements -------------------------------------------------------------
 
+# we
 country_selector <- wellPanel(mod_ui_country_select(id = "country_selected", data = ffd_indicators)) 
 
 flag_section <- wellPanel(
@@ -36,7 +38,7 @@ country_details <- wellPanel(mod_ui_wb_meta(id = "country_desc")
 body_section <- mainPanel(tags$h3("Some stuff"),
                           mod_ui_wb_indicators(id = "indicators"),
                           tags$h3("And some more stuff"),
-                          mod_ui_country_indicators(id = "ffd_indicators")
+                          mod_ui_trade_indicators(id = "ffd_indicators")
                           )
 
 # UI ----------------------------------------------------------------------
@@ -56,9 +58,9 @@ ui <- fluidPage(
 # Server ------------------------------------------------------------------
 server <- function(input, output, session){
   country_selected <- callModule(mod_server_country_select, id = "country_selected")
-  country_indicators <- callModule(mod_server_country_indicators,id =  "ffd_indicators", dataset = ffd_indicators, country = country_selected)
   country_flag <- callModule(mod_server_country_flag, id = "flag", dataset = country_meta, country = country_selected, height = "66", width = "100")
   country_map <- callModule(mod_server_country_map, id = "map", dataset = world, country = country_selected)
+  trade_indicators <- callModule(mod_server_trade_indicators,id =  "ffd_indicators", dataset = ffd_indicators, country = country_selected)
   indicators <- callModule(mod_server_wb_indicators, id =  "indicators", dataset = wb_indicators, country = country_selected)
   wb_text <- callModule(mod_server_wb_meta, id = "country_desc", dataset = wb_indicators, country = country_selected, indicator = reactive("NY.GDP.PCAP.PP.KD"))
 
